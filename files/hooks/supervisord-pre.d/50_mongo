@@ -64,7 +64,7 @@ if (!exists) {
         {
             user: "$ADMINUSER",
             pwd: "$ADMINPASS",
-            roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+            roles: [ { role: "root", db: "admin" } ]
       }
     );
 } else {
