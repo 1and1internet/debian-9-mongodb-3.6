@@ -8,4 +8,9 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
 	&& apt-get update \
 	&& apt-get install -y mongodb-org \
 	&& apt-get clean \
-	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/* \
+	&& mkdir -p /var/log/mongodb \
+	&& chmod 777 /var/log/mongodb
+
+ENV ADMINUSER=defaultadminuser \
+	ADMINPASS=defaultadminpass

@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# We need to create the admin user if it doesn't exist.
+# This requires us starting mongod, running some client mongo javascript, and
+# then stopping mongod so that supervisord can then re-run it (with auth).
+# The javascript is responsible for checking if the user exists and creating it
+# if it doesn't.
+
+function wait_for_mongod_logline {
+    # Make sure log file exists first
+    MAXLOOPS=50
+    while [ ! -f /var/log/mongodb/mongod.log ] && [ $MAXLOOPS -gt 0 ]; do
+        sleep 0.1
+        MAXLOOPS=$(expr $MAXLOOPS - 1)
+        echo -n "!"
+    done
+
+    # Wait for log line
+    LOGLINE=$1
+    MAXLOOPS=50
+    while [ $(tail -5 /var/log/mongodb/mongod.log | grep -q "$LOGLINE" && echo "Y" || echo "N") == "N" ] && [ $MAXLOOPS -gt 0 ]; do
+        sleep 0.1
+        MAXLOOPS=$(expr $MAXLOOPS - 1)
+        echo -n "."
+    done
+    echo
+}
+
+function wait_for_mongod_to_start {
+    wait_for_mongod_logline "waiting for connections on port"
+}
+
+function wait_for_mongod_to_stop {
+    wait_for_mongod_logline "shutting down with code"
+}
+
+function start_mongod {
+    /usr/bin/mongod -f /etc/mongod.conf &
+    wait_for_mongod_to_start
+}
+
+function stop_mongod {
+    kill %1
+    wait_for_mongod_to_stop
+}
+
+function ensure_adminuser_exists {
+    cat > /tmp/setup.js << EOF
+conn = new Mongo();
+db = conn.getDB("admin");
+var users = db.getUsers();
+// printjson(users);
+
+var exists = false;
+for (var i = 0; i < users.length; i++) {
+    if (users[i]["user"] == "$ADMINUSER") {
+        exists = true;
+    }
+}
+
+if (!exists) {
+    printjson("Creating '$ADMINUSER' user");
+    db.createUser(
+        {
+            user: "$ADMINUSER",
+            pwd: "$ADMINPASS",
+            roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
+      }
+    );
+} else {
+    printjson("Admin user '$ADMINUSER' exists, not creating");
+}
+EOF
+
+    mongo /tmp/setup.js
+}
+
+start_mongod
+ensure_adminuser_exists
+stop_mongod
