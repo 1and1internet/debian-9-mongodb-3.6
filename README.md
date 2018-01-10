@@ -2,7 +2,6 @@
 
 ## Description
 
-
 **Ensure you specify a user id (UID) other than zero. Running as root is not a supported configuration.**
 
 ## Current Status: Work In Progress
