@@ -4,6 +4,7 @@ import unittest
 import os
 import docker
 from selenium import webdriver
+import time
 
 
 class Test1and1MongoImage(unittest.TestCase):
@@ -28,6 +29,7 @@ class Test1and1MongoImage(unittest.TestCase):
 
         details = docker.APIClient().inspect_container(container=Test1and1MongoImage.container.id)
         Test1and1MongoImage.container_ip = details['NetworkSettings']['IPAddress']
+        time.sleep(5) # Container needs time to start, stop, then restart mongodb before we test.
 
     @classmethod
     def tearDownClass(cls):
