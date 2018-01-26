@@ -35,7 +35,7 @@ function wait_for_mongod_to_stop {
 }
 
 function start_mongod {
-    /usr/bin/mongod -f /etc/mongod.conf &
+    /usr/bin/mongod -f /etc/mongodlogpath.conf &
     wait_for_mongod_to_start
 }
 
