@@ -11,8 +11,8 @@ from testpack_helper_library.unittests.dockertests import Test1and1Common
 class Test1and1MongoImage(Test1and1Common):
     @classmethod
     def setUpClass(cls):
-        Test1and1Common.setUpClass()
-        time.sleep(5) # Container needs time to start, stop, then restart mongodb before we test.
+        # Container needs time to start, stop, then restart mongodb before we test.
+        Test1and1Common.setUpClass(container_wait=5)
 
     # <tests to run>
 
