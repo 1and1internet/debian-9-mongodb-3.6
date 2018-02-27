@@ -21,7 +21,8 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir -p /var/log/mongodb \
-	&& chmod 777 /var/log/mongodb /var/lib/mongodb
+	&& chmod 777 /var/log/mongodb /var/lib/mongodb \
+    && chmod 666 /etc/mongod.conf
 
 ENV ADMINUSER=defaultadminuser \
 	ADMINPASS=defaultadminpass
