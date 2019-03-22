@@ -5,7 +5,7 @@ RUN git clone https://github.com/1and1internet/configurability.git . \
        && make mongod \
        && echo "configurability mongod plugin successfully built"
 
-FROM 1and1internet/debian-9
+FROM 1and1internet/debian-8
 MAINTAINER brian.wilkinson@1and1.co.uk
 
 COPY files/ /
@@ -13,11 +13,9 @@ COPY --from=configurability_mongod /go/src/github.com/1and1internet/configurabil
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
 	&& apt-get update \
-	&& apt-get install -y gnupg \
 	&& apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5 \
 	&& apt-get update \
 	&& apt-get install -y mongodb-org \
-	&& apt-get remove gnupg \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& mkdir -p /var/log/mongodb \
