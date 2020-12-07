@@ -1,15 +1,16 @@
-FROM golang as configurability_mongod
+FROM golang as configurability
 MAINTAINER brian.wilkinson@1and1.co.uk
 WORKDIR /go/src/github.com/1and1internet/configurability
 RUN git clone https://github.com/1and1internet/configurability.git . \
-       && make mongod \
-       && echo "configurability mongod plugin successfully built"
+       && make main mongod \
+       && echo "configurability successfully built"
 
 FROM 1and1internet/debian-8
 MAINTAINER brian.wilkinson@1and1.co.uk
 
 COPY files/ /
-COPY --from=configurability_mongod /go/src/github.com/1and1internet/configurability/bin/plugins/mongod.so /opt/configurability/goplugins
+COPY --from=configurability /go/src/github.com/1and1internet/configurability/bin/configurator /usr/bin/configurator
+COPY --from=configurability /go/src/github.com/1and1internet/configurability/bin/plugins/* /opt/configurability/goplugins/
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
 	&& apt-get update \
